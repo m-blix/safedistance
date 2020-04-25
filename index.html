@@ -20,9 +20,10 @@ h1 {
 
 #info {
   position: absolute;
+  background-color: #fff;
   top: 10px;
   left: 10px;
-  border: 1px solid black;
+  border: 1px solid #333;
   padding: 6px;
   z-index: 100;
 }
@@ -37,6 +38,13 @@ h1 {
 </div>
 
 <a-scene>
+  <a-entity id="rig" position="0 2 0" wasd-controls>
+    <a-entity geometry="primitive: cylinder; openEnded: true; radius: 2; height: 0.1"
+          material="side: double; color: red" position="0 -1 0"></a-entity>
+    <a-entity id="camera" camera look-controls>
+    </a-entity>
+  </a-entity>
+
   <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
   <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
   <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
