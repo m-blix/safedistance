@@ -44,8 +44,13 @@ p {
 
 <a-scene>
   <a-entity id="rig" position="0 2 0" wasd-controls>
-    <a-entity geometry="primitive: cylinder; openEnded: true; radius: 2; height: 0.1"
-          material="side: double; color: red" position="0 -1 0"></a-entity>
+
+    <a-entity id="safe-radius"
+      geometry="primitive: cylinder; openEnded: true; radius: 2; height: 0.2"
+      material="side: double; color: red; transparent: true; opacity: 0.6" position="0 -1 0">
+
+    </a-entity>
+
     <a-entity id="camera" camera look-controls>
     </a-entity>
   </a-entity>
