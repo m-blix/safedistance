@@ -19,6 +19,8 @@ var controller;
 
 var reticle;
 
+var hitTestEnabled = false;
+
 var hitTestSource = null;
 var hitTestSourceRequested = false;
 
@@ -47,7 +49,11 @@ function init() {
 
   //
 
-  document.body.appendChild( ARButton.createButton( renderer, { requiredFeatures: [ 'hit-test' ] } ) );
+  var requiredFeatures = [];
+  var optionalFeatures = ['hit-test'];
+  var opts = { optionalFeatures: optionalFeatures, requiredFeatures: requiredFeatures };
+
+  document.body.appendChild( ARButton.createButton( renderer, opts ) );
 
   //
 
