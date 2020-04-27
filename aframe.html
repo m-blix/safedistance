@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>SafeDistance</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+h1 {
+  margin: 0;
+  margin-bottom: 5px;
+  font-size: 18px;
+}
+
+p {
+  margin: 0;
+}
+
+#info {
+  position: absolute;
+  background-color: #fff;
+  top: 10px;
+  left: 10px;
+  border: 1px solid #333;
+  padding: 6px;
+  z-index: 100;
+}
+</style>
+<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+</head>
+<body>
+
+<div id="info">
+  <h1>SafeDistance</h1>
+  <p>coming soon</p>
+</div>
+
+<a-scene>
+  <a-entity id="rig" position="0 2 0" wasd-controls look-controls>
+
+    <a-entity id="camera" camera>
+      <a-entity id="sr"
+        position="0 -1 0"
+        geometry="primitive: cylinder; openEnded: true; radius: 2; height: 0.2"
+        material="side: double; color: red; transparent: true; opacity: 0.6">
+      </a-entity>
+    </a-entity>
+  </a-entity>
+
+  <a-entity id="safe-radius" position="0 -1 0" visible="false">
+    <a-entity
+      geometry="primitive: cylinder; openEnded: true; radius: 2; height: 0.2;"
+      material="side: double; color: red; transparent: true; opacity: 0.6">
+    </a-entity>
+    <a-entity
+      rotation="-90 0 0"
+      geometry="primitive: circle; radius: 1.99"
+      material="side: double; color: blue; transparent: true; opacity: 0.3">
+    </a-entity>
+  </a-entity>
+
+  <a-box position="-1 0.52 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+  <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+  <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+  <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+</a-scene>
+
+<script>
+'use strict';
+
+var position = new THREE.Vector3();
+var quaternion = new THREE.Quaternion();
+
+var cameraEl = document.querySelector('#camera');
+var sdEl = document.querySelector('#safe-radius');
+var srEl = document.querySelector('#sr');
+
+var s = 0.01;
+
+function update() {
+  cameraEl.object3D.getWorldPosition(position);
+  cameraEl.object3D.getWorldQuaternion(quaternion);
+ 
+  var xPos = position.x;
+  var zPos = position.z;
+  //sdEl.object3D.position.set(xPos, 1, zPos);
+
+
+
+  //srEl.object3D.applyQuaternion(quaternion);
+  srEl.object3D.lookAt(0, 0, -50);
+  s+= 0.01;
+
+  requestAnimationFrame(update);
+}
+
+requestAnimationFrame(update);
+</script>
+
+</body>
+</html>
