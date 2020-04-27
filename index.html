@@ -52,6 +52,8 @@ var controller;
 
 var reticle;
 
+var ring;
+
 var hitTestEnabled = false;
 
 var hitTestSource = null;
@@ -92,7 +94,7 @@ function init() {
 
   var geometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 0.2, 32 ).translate( 0, 0.1, 0 );
 
-  addRing();
+  ring = addRing();
 
   function onSelect() {
 
@@ -168,6 +170,7 @@ function addRing() {
   group.add(box);
 
   scene.add( group );
+  return group;
 }
 
 function onWindowResize() {
@@ -184,6 +187,12 @@ function animate() {
 }
 
 function render( timestamp, frame ) {
+  var xPos = camera.position.x;
+  var zPos = camera.position.z;
+
+  ring.position.x = xPos;
+  ring.position.z = zPos;
+
   if ( frame ) {
     var referenceSpace = renderer.xr.getReferenceSpace();
     var session = renderer.xr.getSession();
