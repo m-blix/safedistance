@@ -176,7 +176,43 @@ function addRing() {
   group.add(box);
 
   scene.add( group );
+
+  addText(group);
+
   return group;
+}
+
+function addText(obj) {
+  var loader = new THREE.FontLoader();
+  loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+    var xMid, text;
+
+    var color = 0x333333;
+
+    var matLite = new THREE.MeshBasicMaterial( {
+      color: color,
+      transparent: true,
+      opacity: 0.9,
+      side: THREE.DoubleSide
+    } );
+
+    var message = "Stay 6ft apart";
+
+    var shapes = font.generateShapes( message, 0.1 );
+
+    var geometry = new THREE.ShapeBufferGeometry( shapes );
+
+    geometry.computeBoundingBox();
+
+    xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+
+    geometry.translate( xMid, 0, 0 );
+
+    text = new THREE.Mesh( geometry, matLite );
+    text.position.z = -ringRadius * 0.97;
+    obj.add( text );
+  });
 }
 
 function onWindowResize() {
