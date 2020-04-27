@@ -43,19 +43,20 @@ p {
 </div>
 
 <a-scene>
-  <a-entity id="rig" position="0 2 0" wasd-controls>
+  <a-entity id="rig" position="0 2 0" wasd-controls look-controls>
 
-    <a-entity id="camera" camera look-controls>
-      <a-entity
-        geometry="primitive: cylinder; openEnded: true; radius: 1; height: 0.2"
-        material="side: double; color: green; transparent: true; opacity: 0.6">
+    <a-entity id="camera" camera>
+      <a-entity id="sr"
+        position="0 -1 0"
+        geometry="primitive: cylinder; openEnded: true; radius: 2; height: 0.2"
+        material="side: double; color: red; transparent: true; opacity: 0.6">
       </a-entity>
     </a-entity>
   </a-entity>
 
-  <a-entity id="safe-radius" position="0 -1 0">
+  <a-entity id="safe-radius" position="0 -1 0" visible="false">
     <a-entity
-      geometry="primitive: cylinder; openEnded: true; radius: 2; height: 0.2"
+      geometry="primitive: cylinder; openEnded: true; radius: 2; height: 0.2;"
       material="side: double; color: red; transparent: true; opacity: 0.6">
     </a-entity>
     <a-entity
@@ -79,12 +80,23 @@ var quaternion = new THREE.Quaternion();
 
 var cameraEl = document.querySelector('#camera');
 var sdEl = document.querySelector('#safe-radius');
+var srEl = document.querySelector('#sr');
+
+var s = 0.01;
 
 function update() {
   cameraEl.object3D.getWorldPosition(position);
+  cameraEl.object3D.getWorldQuaternion(quaternion);
+ 
   var xPos = position.x;
   var zPos = position.z;
-  sdEl.object3D.position.set(xPos, 1, zPos);
+  //sdEl.object3D.position.set(xPos, 1, zPos);
+
+
+
+  //srEl.object3D.applyQuaternion(quaternion);
+  srEl.object3D.lookAt(0, 0, -50);
+  s+= 0.01;
 
   requestAnimationFrame(update);
 }
