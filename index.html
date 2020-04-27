@@ -53,6 +53,7 @@ var controller;
 var reticle;
 
 var ring;
+var ringD = -0.5;
 
 var hitTestEnabled = false;
 
@@ -98,7 +99,9 @@ function init() {
 
   function onSelect() {
 
-    if ( reticle.visible ) {
+    ring.position.set(0, ringD, 0).applyMatrix4( controller.matrixWorld );
+
+    /*if ( reticle.visible ) {
 
       var material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
       var mesh = new THREE.Mesh( geometry, material );
@@ -106,7 +109,7 @@ function init() {
       mesh.scale.y = Math.random() * 2 + 1;
       scene.add( mesh );
 
-    }
+    }*/
 
   }
 
@@ -131,13 +134,12 @@ function addRing() {
   var r = 2;
   var height = 0.2;
 
-  var d = 0.5;
   var borderHeight = height * 0.1;
   var bh2 = borderHeight/2;
 
   var group = new THREE.Group();
   group.name = 'safeDistance';
-  group.position.set(0, -d, 0);
+  group.position.set(0, ringD, 0);
 
   var geometry = new THREE.CylinderGeometry( r, r, height, 60, 2, true );
   var material = new THREE.MeshBasicMaterial( {
@@ -190,8 +192,8 @@ function render( timestamp, frame ) {
   var xPos = camera.position.x;
   var zPos = camera.position.z;
 
-  ring.position.x = xPos;
-  ring.position.z = zPos;
+  //ring.position.x = xPos;
+  //ring.position.z = zPos;
 
   if ( frame ) {
     var referenceSpace = renderer.xr.getReferenceSpace();
