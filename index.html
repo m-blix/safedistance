@@ -183,11 +183,11 @@ function render( timestamp, frame ) {
     if ( hitTestSourceRequested === false ) {
       session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
 
-        session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
+        /*session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
 
           hitTestSource = source;
 
-        } );
+        } );*/
 
       } );
 
@@ -198,10 +198,10 @@ function render( timestamp, frame ) {
 
       } );
 
-      hitTestSourceRequested = true;
+      //hitTestSourceRequested = true;
     }
 
-    if ( hitTestSource ) {
+    /*if ( hitTestSource ) {
       var hitTestResults = frame.getHitTestResults( hitTestSource );
 
       if ( hitTestResults.length ) {
@@ -213,7 +213,7 @@ function render( timestamp, frame ) {
         reticle.visible = false;
       }
 
-    }
+    }*/
   }
 
   renderer.render( scene, camera );
