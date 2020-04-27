@@ -1,12 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>SafeDistance - threejs</title>
+  <title>SafeDistance &middot; Social Distance with AR</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link type="text/css" rel="stylesheet" href="main.css">
+<style>
+:root {
+  --margin: 10px;
+}
+
+#info {
+  position: absolute;
+  top: var(--margin);
+  left: var(--margin);
+  padding: 5;
+  border: 1px solid #333;
+  background-color: #fff;
+  z-index: 100;
+  width: calc(100% - 2*var(--margin));
+  text-align: center;
+  color: #333;
+}
+
+h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+p {
+  margin: 0;
+  font-size: 14px;
+}
+</style>
 </head>
 <body>
+
+<div id="info">
+  <h1>SafeDistance</h1>
+  <p>Stay 6ft+ away to stay safe from COVID-19</p>
+</div>
 
 <script type="module">
 
