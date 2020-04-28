@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>SafeDistance &middot; Social Distance with AR</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link type="text/css" rel="stylesheet" href="main.css">
+<style>
+:root {
+  --margin: 10px;
+}
+
+#info {
+  position: absolute;
+  top: var(--margin);
+  left: var(--margin);
+  padding: 5;
+  border: 1px solid #333;
+  background-color: #fff;
+  z-index: 100;
+  width: calc(100% - 2*var(--margin));
+  text-align: center;
+  color: #333;
+}
+
+h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+p {
+  margin: 0;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<div id="info">
+  <h1>SafeDistance</h1>
+  <p>Stay 6ft+ away to stay safe from COVID-19</p>
+</div>
+
+<script type="module">
+
+import * as THREE from './js/three.module.js';
+import { ARButton } from './js/ARButton.js';
+
+var container;
+var camera, scene, renderer;
+var controller;
+
+var reticle;
+
+var ring;
+const FEET_TO_METERS = 0.3048;
+var ringRadius = 6 * FEET_TO_METERS;
+var ringD = -0.5;
+
+var autoUpdatePosition = false;
+
+var hitTestEnabled = false;
+
+var hitTestSource = null;
+var hitTestSourceRequested = false;
+
+init();
+animate();
+
+function init() {
+  container = document.createElement( 'div' );
+  document.body.appendChild( container );
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
+
+  var light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
+  light.position.set( 0.5, 1, 0.25 );
+  scene.add( light );
+
+  //
+
+  renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.xr.enabled = true;
+  container.appendChild( renderer.domElement );
+
+  //
+
+  var requiredFeatures = [];
+  var optionalFeatures = ['hit-test'];
+  var opts = { optionalFeatures: optionalFeatures, requiredFeatures: requiredFeatures };
+
+  document.body.appendChild( ARButton.createButton( renderer, opts ) );
+
+  //
+
+  var geometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 0.2, 32 ).translate( 0, 0.1, 0 );
+
+  ring = addRing();
+
+  function onSelect() {
+
+    if ( reticle.visible ) {
+
+      var material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
+      var mesh = new THREE.Mesh( geometry, material );
+      mesh.position.setFromMatrixPosition( reticle.matrix );
+      mesh.scale.y = Math.random() * 2 + 1;
+      scene.add( mesh );
+
+    }
+
+  }
+
+  controller = renderer.xr.getController( 0 );
+  controller.addEventListener( 'select', onSelect );
+  scene.add( controller );
+
+  reticle = new THREE.Mesh(
+    new THREE.RingBufferGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
+    new THREE.MeshBasicMaterial()
+  );
+  reticle.matrixAutoUpdate = false;
+  reticle.visible = false;
+  scene.add( reticle );
+  //
+
+  window.addEventListener( 'resize', onWindowResize, false );
+
+}
+
+function addRing() {
+  var r = 2;
+  var height = 0.2;
+
+  var borderHeight = height * 0.1;
+  var bh2 = borderHeight/2;
+
+  var group = new THREE.Group();
+  group.name = 'safeDistance';
+  group.position.set(0, ringD, 0);
+
+  var geometry = new THREE.CylinderGeometry( r, r, height, 60, 2, true );
+  var material = new THREE.MeshBasicMaterial( {
+    color: 0xffff00,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.6 } );
+  var cylinder = new THREE.Mesh( geometry, material );
+  cylinder.position.set(0, 0, 0);
+  group.add( cylinder );
+
+  geometry = new THREE.CylinderGeometry( r, r, borderHeight, 60, 2, true );
+  material = new THREE.MeshBasicMaterial( {
+    color: 0x444444,
+    side: THREE.DoubleSide } );
+  var cylinder2 = new THREE.Mesh( geometry, material );
+  cylinder2.position.set(0, height/2 + bh2, 0);
+  group.add( cylinder2 );
+
+  var cylinder3 = new THREE.Mesh( geometry, material );
+  cylinder3.position.set(0, -height/2 - bh2, 0);
+  group.add( cylinder3 );
+
+  geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+  material = new THREE.MeshBasicMaterial( {
+    color: 0x999999
+  });
+  var box = new THREE.Mesh( geometry, material );
+  box.position.set(0, 0, 0);
+  group.add(box);
+
+  scene.add( group );
+
+  addText(group);
+
+  return group;
+}
+
+function addText(obj) {
+  var loader = new THREE.FontLoader();
+  loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+    var xMid, text;
+
+    var color = 0x333333;
+
+    var matLite = new THREE.MeshBasicMaterial( {
+      color: color,
+      transparent: true,
+      opacity: 0.9,
+      side: THREE.DoubleSide
+    } );
+
+    var message = "Stay 6ft apart";
+
+    var shapes = font.generateShapes( message, 0.1 );
+
+    var geometry = new THREE.ShapeBufferGeometry( shapes );
+
+    geometry.computeBoundingBox();
+
+    xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+
+    geometry.translate( xMid, 0, 0 );
+
+    text = new THREE.Mesh( geometry, matLite );
+    text.position.z = -ringRadius * 0.97;
+    obj.add( text );
+  });
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
+//
+
+function animate() {
+  renderer.setAnimationLoop( render );
+}
+
+function render( timestamp, frame ) {
+
+  if ( frame ) {
+    var referenceSpace = renderer.xr.getReferenceSpace();
+    var session = renderer.xr.getSession();
+
+    if ( hitTestSourceRequested === false ) {
+      session.requestReferenceSpace( 'viewer' ).then( function ( referenceSpace ) {
+
+        session.requestHitTestSource( { space: referenceSpace } ).then( function ( source ) {
+
+          hitTestSource = source;
+
+        } );
+
+      } );
+
+      session.addEventListener( 'end', function () {
+
+        hitTestSourceRequested = false;
+        hitTestSource = null;
+
+      } );
+
+      hitTestSourceRequested = true;
+    }
+
+    if ( hitTestSource ) {
+      var hitTestResults = frame.getHitTestResults( hitTestSource );
+
+      if ( hitTestResults.length ) {
+        var hit = hitTestResults[ 0 ];
+
+        reticle.visible = true;
+        reticle.matrix.fromArray( hit.getPose( referenceSpace ).transform.matrix );
+      } else {
+        reticle.visible = false;
+      }
+
+    }
+  }
+
+  renderer.render( scene, camera );
+}
+
+</script>
+</body>
+</html>
